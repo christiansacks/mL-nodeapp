@@ -161,8 +161,6 @@ def sendEmail() :
     f.writelines("        Cram-MD5: "+cramMD5+"\n")
     f.writelines("    BBS Software: "+bbsSoftware+"\n")
     f.writelines("\n")
-    f.writelines("Please assign a node as soon as possible and let the user know when completed.\n")
-    f.writelines("\n")
 
   f.close()
 
@@ -170,6 +168,7 @@ def sendEmail() :
   baseID = 1
 
   menucmd('MX', tmpFile+';'+str(baseID)+';'+handle+';'+SYSOP+';'+subject)
+  menucmd('MX', tmpFile+';'+str(baseID)+';'+'Node Application Robot'+';'+handle+';'+subject)
   os.remove(tmpFile)
 
 # add/edit application
