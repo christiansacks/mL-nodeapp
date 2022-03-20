@@ -30,6 +30,7 @@ There is one argument being passed, and that is the network name you wish to get
 ## Network configuration file
 In your theme's text directory, where you copied the `mL-nodeapp` directory into, you will see some example configs;
 
+```
 mL-nodeapp
 └── nets
     ├── retronet
@@ -38,9 +39,11 @@ mL-nodeapp
     └── tqwnet
         ├── header.ans
         └── net.ini
+```
 
 You will see there is a config file called `net.ini`, in here are various options for things like colour schemes and infopack location etc. Here's the tqwnet net.ini config;
 
+```
 [network]
 netName = tqwnet
 netSysop = MeaTLoTioN
@@ -53,5 +56,4 @@ fieldBG = 17
 fieldFG = 15
 normBG = 16
 menuOption = 14
-
-
+```
