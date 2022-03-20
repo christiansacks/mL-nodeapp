@@ -38,7 +38,7 @@ def checkNets(X) :
       return True
 
 def getNetCfg(NET) :
-  global netName,netSysop,netAddress,headerFile,introFile,infoPack
+  global netName,netSysop,netAddress,headerFile,infoPack
   global brightColour,normColour,menuOption,fieldBG,fieldFG,normBG
   config = ConfigParser.ConfigParser()
   config.read(NETINI)
@@ -48,7 +48,6 @@ def getNetCfg(NET) :
       netSysop = config.get('network','netSysop')
       netAddress = config.get('network','netAddress')
       headerFile = NETSPATH+"/"+ARG+"/"+config.get('network','header')
-      introFile = NETSPATH+"/"+ARG+"/"+config.get('network','intro')
       infoPack = config.get('network','infoPack')
       brightColour = config.get('network','brightColour')
       normColour = config.get('network','normColour')
