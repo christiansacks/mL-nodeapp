@@ -1,0 +1,351 @@
+# :: Filename: mL-nodeapp.mpy
+# ::   Author: MeaTLoTioN
+# ::     Date: 2022-03-20
+
+# imports
+import os
+import json
+import sys
+import ConfigParser
+import pickle
+from mystic_bbs import *
+
+# global args
+ARG=str(param_str(1))
+CFG=getcfg()
+TEXTPATH = CFG["text"]
+NETSPATH = TEXTPATH+"mL-nodeapp/nets"
+NETSD = {}
+thisuser = getuser(0)
+handle = thisuser['handle']
+handleSL = int(mci2str('SL'))
+global application
+application = {}
+application[handle] = {}
+SYSOP = 'MeaTLoTioN'
+
+# functions
+def getNets() :
+  for root, dirs, files in os.walk(NETSPATH) :
+    TMP = str(os.path.basename(root))
+    if TMP != '' :
+      NETSD[TMP] = root
+
+def checkNets(X) :
+  for NET in NETSD :
+    if X in NET :
+      #writeln("Found something. You said "+X+" and we have "+NET)
+      return True
+
+def getNetCfg(NET) :
+  global netName,netSysop,netAddress,headerFile,introFile,infoPack
+  global brightColour,normColour,menuOption,fieldBG,fieldFG,normBG
+  config = ConfigParser.ConfigParser()
+  config.read(NETINI)
+  for section in config.sections() :
+    if section == 'network' :
+      netName = config.get('network','netName')
+      netSysop = config.get('network','netSysop')
+      netAddress = config.get('network','netAddress')
+      headerFile = NETSPATH+"/"+ARG+"/"+config.get('network','header')
+      introFile = NETSPATH+"/"+ARG+"/"+config.get('network','intro')
+      infoPack = config.get('network','infoPack')
+      brightColour = config.get('network','brightColour')
+      normColour = config.get('network','normColour')
+      fieldBG = config.get('network','fieldBG')
+      fieldFG = config.get('network','fieldFG')
+      normBG = config.get('network','normBG')
+      menuOption = config.get('network','menuOption')
+
+# strip mci codes
+def stripmci(str) :
+  pos = str.find("|")
+  while pos != -1 :
+    str = str[:pos] + str[pos+3:]
+    pos = str.find("|")
+  return str
+
+# get length of a string with mci codes
+def mcilen(str) :
+  return len(stripmci(str))
+
+# main
+getNets()
+if checkNets(ARG) :
+  NETINI = NETSPATH+"/"+ARG+"/net.ini"
+  #writeln(NETINI)
+
+# define header
+def headerScreen() :
+  showfile(headerFile,0,False,False,False)
+  title = "|16|11N|03ode |11R|03equest |11A|03pplication|05, |11b|03y |14M|15e|07aTLoTioN |05v|130|05.|131|05a"
+  titleLen = len(stripmci(title))
+  gotoxy((80-titleLen)/2,10); writeln(title)
+
+# init main screen
+def initMainScreen() :
+  write("|CL")
+  headerScreen()
+  
+# main menu
+def mainMenu() :
+  gotoxy(20,12); writeln("|08[|"+menuOption+"A|08]|"+normColour+"dd or edit an application")
+  gotoxy(20,13); writeln("|08[|"+menuOption+"V|08]|"+normColour+"iew an existing application")
+  gotoxy(20,14); writeln("|08[|"+menuOption+"D|08]|"+normColour+"ownload the infopack")
+  if handleSL == 255 :
+    gotoxy(20,15); writeln("|08[|"+menuOption+"P|08]|"+normColour+"rocess existing application (sysop only)")
+    gotoxy(20,16); writeln("|08[|"+menuOption+"Q|08]|"+normColour+"uit the application")
+    gotoxy(20,18); write("|"+brightColour+"C|"+normColour+"hoose: ")
+  else :
+    gotoxy(20,15); writeln("|08[|"+menuOption+"Q|08]|"+normColour+"uit the application")
+    gotoxy(20,17); write("|"+brightColour+"C|"+normColour+"hoose: ")
+
+def saveFile() :
+  applicationDir = NETSPATH+"/"+ARG+"/applications"
+  applicationFile = applicationDir+"/"+handle+".dat"
+  if not os.path.exists(applicationDir) :
+    os.makedirs(applicationDir)
+  file = open(applicationFile, 'wb')
+  pickle.dump(application, file)
+  file.close()
+
+def loadFile() :
+  global application
+  applicationDir = NETSPATH+"/"+ARG+"/applications"
+  applicationFile = applicationDir+"/"+handle+".dat"
+  file = open(applicationFile, 'rb')
+  application = pickle.load(file)
+  file.close()
+
+def sendEmail() :
+  applicationDir = NETSPATH+"/"+ARG+"/applications"
+  applicationFile = applicationDir+"/"+handle+".dat"
+
+  apDict = application[handle]
+  realName = apDict["realName"]
+  bbsName = apDict["bbsName"]
+  telnetAddress = apDict["telnetAddress"]
+  cityState = apDict["cityState"]
+  sysopName = apDict["sysopName"]
+  emailAddress = apDict["emailAddress"]
+  binkpAddress = apDict["binkpAddress"]
+  binkpPort = apDict["binkpPort"]
+  sessionPassword = apDict["sessionPassword"]
+  allfixPassword = apDict["allfixPassword"]
+  pktPassword = apDict["pktPassword"]
+  ticPassword = apDict["ticPassword"]
+  numNodes = apDict["numNodes"]
+  if apDict["cramMD5"] :
+    cramMD5 = "Yes"
+  else :
+    cramMD5 = "No"
+  bbsSoftware = apDict["bbsSoftware"]
+
+  tmpFile = "/tmp/"+handle+".tmp"
+  with open(tmpFile, 'w') as f :
+    f.writelines("You have a new node application waiting for approval!\n")
+    f.writelines("Here are the details;\n")
+    f.writelines("\n")
+    f.writelines("       Real Name: "+realName+"\n")
+    f.writelines("        BBS Name: "+bbsName+"\n")
+    f.writelines("  Telnet Address: "+telnetAddress+"\n")
+    f.writelines("      City/State: "+cityState+"\n")
+    f.writelines("      Sysop Name: "+sysopName+"\n")
+    f.writelines("   Email Address: "+emailAddress+"\n")
+    f.writelines("   BinkP Address: "+binkpAddress+"\n")
+    f.writelines("      BinkP Port: "+str(binkpPort)+"\n")
+    f.writelines("Session Password: "+sessionPassword+"\n")
+    f.writelines(" Allfix Password: "+allfixPassword+"\n")
+    f.writelines("    PKT Password: "+pktPassword+"\n")
+    f.writelines("    TIC Password: "+ticPassword+"\n")
+    f.writelines(" Number of nodes: "+str(numNodes)+"\n")
+    f.writelines("        Cram-MD5: "+cramMD5+"\n")
+    f.writelines("    BBS Software: "+bbsSoftware+"\n")
+    f.writelines("\n")
+    f.writelines("Please assign a node as soon as possible and let the user know when completed.\n")
+    f.writelines("\n")
+
+  f.close()
+
+  subject = "New Node Application"
+  baseID = 1
+
+  menucmd('MX', tmpFile+';'+str(baseID)+';'+handle+';'+SYSOP+';'+subject)
+  os.remove(tmpFile)
+
+# add/edit application
+def addEditApplication() :
+  initMainScreen()
+  applicationDir = NETSPATH+"/"+ARG+"/applications"
+  applicationFile = applicationDir+"/"+handle+".dat"
+
+  if os.path.exists(applicationFile) :
+    loadFile()
+    apDict = application[handle]
+    realName = apDict["realName"]
+    bbsName = apDict["bbsName"]
+    telnetAddress = apDict["telnetAddress"]
+    cityState = apDict["cityState"]
+    sysopName = apDict["sysopName"]
+    emailAddress = apDict["emailAddress"]
+    binkpAddress = apDict["binkpAddress"]
+    binkpPort = apDict["binkpPort"]
+    sessionPassword = apDict["sessionPassword"]
+    allfixPassword = apDict["allfixPassword"]
+    pktPassword = apDict["pktPassword"]
+    ticPassword = apDict["ticPassword"]
+    numNodes = apDict["numNodes"]
+    if apDict["cramMD5"] :
+      cramMD5 = "Yes"
+    else :
+      cramMD5 = "No"
+    bbsSoftware = apDict["bbsSoftware"]
+  else :
+    realName = ""
+    bbsName = ""
+    telnetAddress = ""
+    cityState = ""
+    sysopName = handle
+    emailAddress = ""
+    binkpAddress = ""
+    binkpPort = "24554"
+    sessionPassword = ""
+    allfixPassword = ""
+    pktPassword = ""
+    ticPassword = ""
+    numNodes = ""
+    bbsSoftware = ""
+
+  # left side
+  gotoxy(18,12); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(7,12); write("|"+normBG+"|"+normColour+"Real Name: "+"|"+fieldBG+realName+"|"+normBG)
+  gotoxy(18,13); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(8,13); write("|"+normBG+"|"+normColour+"BBS Name: "+"|"+fieldBG+bbsName+"|"+normBG)
+  gotoxy(18,14); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(2,14); write("|"+normBG+"|"+normColour+"Telnet Address: "+"|"+fieldBG+telnetAddress+"|"+normBG)
+  gotoxy(18,15); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(6,15); write("|"+normBG+"|"+normColour+"City/State: "+"|"+fieldBG+cityState+"|"+normBG)
+  gotoxy(18,16); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(6,16); write("|"+normBG+"|"+normColour+"Sysop Name: "+"|"+fieldBG+sysopName+"|"+normBG)
+  gotoxy(18,17); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(3,17); write("|"+normBG+"|"+normColour+"Email Address: "+"|"+fieldBG+emailAddress+"|"+normBG)
+  gotoxy(18,18); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(3,18); write("|"+normBG+"|"+normColour+"BinkP Address: "+"|"+fieldBG+binkpAddress+"|"+normBG)
+  gotoxy(18,19); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(4,19); write("|"+normBG+"|"+normColour+"BinkP Port #: "+"|"+fieldBG+binkpPort+"|"+normBG)
+
+  # right side
+  gotoxy(59,12); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(41,12); write("|"+normBG+"|"+normColour+"Session Password: "+"|"+fieldBG+sessionPassword+"|"+normBG)
+  gotoxy(59,13); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(42,13); write("|"+normBG+"|"+normColour+"Allfix Password: "+"|"+fieldBG+allfixPassword+"|"+normBG)
+  gotoxy(59,14); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(45,14); write("|"+normBG+"|"+normColour+"PKT Password: "+"|"+fieldBG+pktPassword+"|"+normBG)
+  gotoxy(59,15); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(45,15); write("|"+normBG+"|"+normColour+"TIC Password: "+"|"+fieldBG+ticPassword+"|"+normBG)
+  gotoxy(59,16); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(47,16); write("|"+normBG+"|"+normColour+"# of Nodes: "+"|"+fieldBG+numNodes+"|"+normBG)
+  gotoxy(59,17); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(49,17); write("|"+normBG+"|"+normColour+"Cram-MD5: "+"|"+fieldBG+cramMD5+"|"+normBG)
+  gotoxy(59,18); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(45,18); write("|"+normBG+"|"+normColour+"BBS Software: "+"|"+fieldBG+bbsSoftware+"|"+normBG)
+  
+  # first arg = style; 0=n/a / 1=norm / 2=CAPS / 3=Capitalised / 4=US Phone / 5=Date MM/DD/YYYY / 6=password hidden / 7=lowercase
+
+  # left side
+  gotoxy(17,12); write("|14>"); gotoxy(18,12); write("|"+fieldBG+"|"+fieldFG); realName = getstr(1, 20, 50, realName); gotoxy(17,12); write(" ");
+  gotoxy(17,13); write("|14>"); gotoxy(18,13); write("|"+fieldBG+"|"+fieldFG); bbsName = getstr(1, 20, 50, bbsName); gotoxy(17,13); write(" ");
+  gotoxy(17,14); write("|14>"); gotoxy(18,14); write("|"+fieldBG+"|"+fieldFG); telnetAddress = getstr(1, 20, 50, telnetAddress); gotoxy(17,14); write(" ");
+  gotoxy(17,15); write("|14>"); gotoxy(18,15); write("|"+fieldBG+"|"+fieldFG); cityState = getstr(1, 20, 50, cityState); gotoxy(17,15); write(" ");
+  gotoxy(17,16); write("|14>"); gotoxy(18,16); write("|"+fieldBG+"|"+fieldFG); sysopName = getstr(1, 20, 50, sysopName); gotoxy(17,16); write(" ");
+  gotoxy(17,17); write("|14>"); gotoxy(18,17); write("|"+fieldBG+"|"+fieldFG); emailAddress = getstr(1, 20, 50, emailAddress); gotoxy(17,17); write(" ");
+  gotoxy(17,18); write("|14>"); gotoxy(18,18); write("|"+fieldBG+"|"+fieldFG); binkpAddress = getstr(1, 20, 50, binkpAddress); gotoxy(17,18); write(" ");
+  gotoxy(17,19); write("|14>"); gotoxy(18,19); write("|"+fieldBG+"|"+fieldFG); binkpPort = getstr(1, 20, 50, binkpPort); gotoxy(17,19); write(" ");
+
+  # right side
+  gotoxy(58,12); write("|14>"); gotoxy(59,12); write("|"+fieldBG+"|"+fieldFG); sessionPassword = getstr(1, 20, 50, sessionPassword); gotoxy(58,12); write(" ");
+  gotoxy(58,13); write("|14>"); gotoxy(59,13); write("|"+fieldBG+"|"+fieldFG); allfixPassword = getstr(1, 8, 8, allfixPassword); gotoxy(58,13); write(" ");
+  gotoxy(58,14); write("|14>"); gotoxy(59,14); write("|"+fieldBG+"|"+fieldFG); pktPassword = getstr(1, 8, 8, pktPassword); gotoxy(58,14); write(" ");
+  gotoxy(58,15); write("|14>"); gotoxy(59,15); write("|"+fieldBG+"|"+fieldFG); ticPassword = getstr(1, 8, 8, ticPassword); gotoxy(58,15); write(" ");
+  gotoxy(58,16); write("|14>"); gotoxy(59,16); write("|"+fieldBG+"|"+fieldFG); numNodes = getstr(1, 20, 50, numNodes); gotoxy(58,16); write(" ");
+  gotoxy(58,17); write("|14>"); gotoxy(59,17); write("|"+fieldBG+"|"+fieldFG); cramMD5 = getyn("", True); gotoxy(58,17); write(" ");
+  gotoxy(58,18); write("|14>"); gotoxy(59,18); write("|"+fieldBG+"|"+fieldFG); bbsSoftware = getstr(1, 20, 50, bbsSoftware); gotoxy(58,18); write(" ");
+
+  apDict = application[handle]
+  apDict["realName"] = realName
+  apDict["bbsName"] = bbsName
+  apDict["telnetAddress"] = telnetAddress
+  apDict["cityState"] = cityState
+  apDict["sysopName"] = sysopName
+  apDict["emailAddress"] = emailAddress
+  apDict["binkpAddress"] = binkpAddress
+  apDict["binkpPort"] = binkpPort
+  apDict["sessionPassword"] = sessionPassword
+  apDict["allfixPassword"] = allfixPassword
+  apDict["pktPassword"] = pktPassword
+  apDict["ticPassword"] = ticPassword
+  apDict["numNodes"] = numNodes
+  apDict["cramMD5"] = cramMD5
+  apDict["bbsSoftware"] = bbsSoftware
+
+  gotoxy(12,23); saveApplication = getyn("Save this application? ", True)
+  if saveApplication :
+    saveFile()
+    sendEmail()
+  else :
+    pass
+
+# view existing application
+def viewApplication() :
+  initMainScreen()
+  loadFile()
+  apDict = application[handle]
+  realName = apDict["realName"]
+  bbsName = apDict["bbsName"]
+  telnetAddress = apDict["telnetAddress"]
+  cityState = apDict["cityState"]
+  sysopName = apDict["sysopName"]
+  emailAddress = apDict["emailAddress"]
+  binkpAddress = apDict["binkpAddress"]
+  binkpPort = apDict["binkpPort"]
+  sessionPassword = apDict["sessionPassword"]
+  allfixPassword = apDict["allfixPassword"]
+  pktPassword = apDict["pktPassword"]
+  ticPassword = apDict["ticPassword"]
+  numNodes = apDict["numNodes"]
+  if apDict["cramMD5"] :
+    cramMD5 = "Yes"
+  else :
+    cramMD5 = "No"
+  bbsSoftware = apDict["bbsSoftware"]
+
+  # left side
+  gotoxy(18,12); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(7,12); write("|"+normBG+"|"+normColour+"Real Name: "+"|"+fieldBG+"|"+fieldFG+realName+"|"+normBG)
+  gotoxy(18,13); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(8,13); write("|"+normBG+"|"+normColour+"BBS Name: "+"|"+fieldBG+"|"+fieldFG+bbsName+"|"+normBG)
+  gotoxy(18,14); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(2,14); write("|"+normBG+"|"+normColour+"Telnet Address: "+"|"+fieldBG+"|"+fieldFG+telnetAddress+"|"+normBG)
+  gotoxy(18,15); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(6,15); write("|"+normBG+"|"+normColour+"City/State: "+"|"+fieldBG+"|"+fieldFG+cityState+"|"+normBG)
+  gotoxy(18,16); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(6,16); write("|"+normBG+"|"+normColour+"Sysop Name: "+"|"+fieldBG+"|"+fieldFG+sysopName+"|"+normBG)
+  gotoxy(18,17); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(3,17); write("|"+normBG+"|"+normColour+"Email Address: "+"|"+fieldBG+"|"+fieldFG+emailAddress+"|"+normBG)
+  gotoxy(18,18); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(3,18); write("|"+normBG+"|"+normColour+"BinkP Address: "+"|"+fieldBG+"|"+fieldFG+binkpAddress+"|"+normBG)
+  gotoxy(18,19); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(4,19); write("|"+normBG+"|"+normColour+"BinkP Port #: "+"|"+fieldBG+"|"+fieldFG+binkpPort+"|"+normBG)
+
+  # right side
+  gotoxy(59,12); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(41,12); write("|"+normBG+"|"+normColour+"Session Password: "+"|"+fieldBG+"|"+fieldFG+sessionPassword+"|"+normBG)
+  gotoxy(59,13); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(42,13); write("|"+normBG+"|"+normColour+"Allfix Password: "+"|"+fieldBG+"|"+fieldFG+allfixPassword+"|"+normBG)
+  gotoxy(59,14); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(45,14); write("|"+normBG+"|"+normColour+"PKT Password: "+"|"+fieldBG+"|"+fieldFG+pktPassword+"|"+normBG)
+  gotoxy(59,15); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(45,15); write("|"+normBG+"|"+normColour+"TIC Password: "+"|"+fieldBG+"|"+fieldFG+ticPassword+"|"+normBG)
+  gotoxy(59,16); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(47,16); write("|"+normBG+"|"+normColour+"# of Nodes: "+"|"+fieldBG+"|"+fieldFG+numNodes+"|"+normBG)
+  gotoxy(59,17); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(49,17); write("|"+normBG+"|"+normColour+"Cram-MD5: |"+fieldBG+"|"+fieldFG+cramMD5+"|"+normBG)
+  gotoxy(59,18); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(45,18); write("|"+normBG+"|"+normColour+"BBS Software: "+"|"+fieldBG+"|"+fieldFG+bbsSoftware+"|"+normBG)
+  gotoxy(1,23); write("|PA")
+
+# pull network config first ready for main program to start
+getNetCfg(ARG)
+initMainScreen()
+mainMenu()
+finished = False
+while not finished :
+  initMainScreen()
+  mainMenu()
+  if handleSL == 255 :
+    ch = onekey(chr(13) + 'AVDPQ', False)
+  else :
+    ch = onekey(chr(13) + 'AVDQ', False)
+  if ch == 'Q' :
+    finished = True
+    break
+  elif ch == 'A' :
+    addEditApplication()
+  elif ch == 'V' :
+    viewApplication()
+  elif ch == 'D' :
+    menucmd('F3',infoPack)
+  elif ch == 'P' :
+    pass
+
+gotoxy(1,24); writeln("|PA")
