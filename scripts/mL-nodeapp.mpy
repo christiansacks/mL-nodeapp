@@ -88,15 +88,15 @@ def initMainScreen() :
   
 # main menu
 def mainMenu() :
-  gotoxy(20,12); writeln("|08[|"+menuOption+"A|08]|"+normColour+"dd or edit an application")
-  gotoxy(20,13); writeln("|08[|"+menuOption+"V|08]|"+normColour+"iew an existing application")
-  gotoxy(20,14); writeln("|08[|"+menuOption+"D|08]|"+normColour+"ownload the infopack")
+  gotoxy(20,12); writeln("|08[|"+menuOption+"A|08]|"+normColour+"dd "+"|"+brightColour+"or "+"|"+brightColour+"e"+"|"+normColour+"dit "+"|"+brightColour+"a"+"|"+normColour+"n "+"|"+brightColour+"a"+"|"+normColour+"pplication")
+  gotoxy(20,13); writeln("|08[|"+menuOption+"V|08]|"+normColour+"iew "+"|"+brightColour+"an "+"|"+brightColour+"e"+"|"+normColour+"xisting "+"|"+brightColour+"a"+"|"+normColour+"pplication")
+  gotoxy(20,14); writeln("|08[|"+menuOption+"D|08]|"+normColour+"ownload "+"|"+brightColour+"t"+"|"+normColour+"he "+"|"+brightColour+"i"+"|"+normColour+"nfopack")
   if handleSL == 255 :
-    gotoxy(20,15); writeln("|08[|"+menuOption+"P|08]|"+normColour+"rocess existing application (sysop only)")
-    gotoxy(20,16); writeln("|08[|"+menuOption+"Q|08]|"+normColour+"uit the application")
+    gotoxy(20,15); writeln("|08[|"+menuOption+"P|08]|"+normColour+"rocess "+"|"+brightColour+"e"+"|"+normColour+"xisting "+"|"+brightColour+"a"+"|"+normColour+"pplication "+"|"+brightColour+"("+"|"+brightColour+"s"+"|"+normColour+"ysop "+"|"+brightColour+"o"+"|"+normColour+"nly)")
+    gotoxy(20,16); writeln("|08[|"+menuOption+"Q|08]|"+normColour+"uit "+"|"+brightColour+"t"+"|"+normColour+"he "+"|"+brightColour+"a"+"|"+normColour+"pplication")
     gotoxy(20,18); write("|"+brightColour+"C|"+normColour+"hoose: ")
   else :
-    gotoxy(20,15); writeln("|08[|"+menuOption+"Q|08]|"+normColour+"uit the application")
+    gotoxy(20,15); writeln("|08[|"+menuOption+"Q|08]|"+normColour+"uit "+"|"+brightColour+"t"+"|"+normColour+"he "+"|"+brightColour+"a"+"|"+normColour+"pplication")
     gotoxy(20,17); write("|"+brightColour+"C|"+normColour+"hoose: ")
 
 def saveFile() :
