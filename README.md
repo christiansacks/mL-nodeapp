@@ -57,3 +57,6 @@ fieldFG = 15
 normBG = 16
 menuOption = 14
 ```
+
+## TO-DO
+Sysop side to process the application
