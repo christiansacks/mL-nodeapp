@@ -168,10 +168,18 @@ def sendEmail() :
   f.close()
 
   subject = "New Node Application"
-  baseID = 1
+  emailBaseID = 1
+  netmailBaseID = 9
 
-  menucmd('MX', tmpFile+';'+str(baseID)+';'+'Node Application Robot'+';'+SYSOP+';'+subject)
-  menucmd('MX', tmpFile+';'+str(baseID)+';'+'Node Application Robot'+';'+handle+';'+subject)
+  # sent netmail to configured network's master sysop
+  menucmd('MX', tmpFile+';'+str(netmailBaseID)+';'+'Node Application Robot'+';'+SYSOP+';'+subject+";"+netAddress)
+
+  # send local email to the sysop of this bbs
+  menucmd('MX', tmpFile+';'+str(emailBaseID)+';'+'Node Application Robot'+';'+SYSOP+';'+subject)
+
+  # send local email to the person requesting the new node
+  menucmd('MX', tmpFile+';'+str(emailBaseID)+';'+'Node Application Robot'+';'+handle+';'+subject)
+
   os.remove(tmpFile)
 
 # add/edit application
