@@ -33,6 +33,9 @@ In your theme's text directory, where you copied the `mL-nodeapp` directory into
 ```
 mL-nodeapp
 └── nets
+    ├── fishingnet
+    │   ├── header.ans
+    │   └── net.ini
     ├── retronet
     │   ├── header.ans
     │   └── net.ini
