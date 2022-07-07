@@ -296,6 +296,7 @@ def viewApplication() :
   applicationDir = NETSPATH+"/"+ARG+"/applications"
   applicationFile = applicationDir+"/"+handle+".dat"
   if os.path.exists(applicationFile) :
+    apDict = realName = bbsName = telnetAddress = cityState = sysopName = emailAddress = binkpAddress = binkpPort = sessionPassword = allfixPassword = pktPassword = ticPassword = numNodes = ""
     loadFile()
     apDict = application[handle]
     realName = apDict["realName"]
