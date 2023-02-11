@@ -18,6 +18,7 @@ NETSPATH = TEXTPATH+"mL-nodeapp/nets"
 NETSD = {}
 thisuser = getuser(0)
 handle = thisuser['handle']
+realName = thisuser['name']
 handleSL = int(mci2str('SL'))
 global application
 application = {}
@@ -184,6 +185,7 @@ def sendEmail() :
 
 # add/edit application
 def addEditApplication() :
+  global realName
   initMainScreen()
   applicationDir = NETSPATH+"/"+ARG+"/applications"
   applicationFile = applicationDir+"/"+handle+".dat"
@@ -210,21 +212,21 @@ def addEditApplication() :
       cramMD5 = "No"
     bbsSoftware = apDict["bbsSoftware"]
   else :
-    realName = ""
-    bbsName = ""
-    telnetAddress = ""
-    cityState = ""
+    #realName = "CHANGEME"
+    bbsName = "CHANGEME"
+    telnetAddress = "CHANGEME"
+    cityState = "CHANGEME"
     sysopName = handle
-    emailAddress = ""
-    binkpAddress = ""
+    emailAddress = "CHANGEME"
+    binkpAddress = "CHANGEME"
     binkpPort = "24554"
-    sessionPassword = ""
-    allfixPassword = ""
-    pktPassword = ""
-    ticPassword = ""
-    numNodes = ""
-    cramMD5 = ""
-    bbsSoftware = ""
+    sessionPassword = "CHANGEME"
+    allfixPassword = "CHANGEME"
+    pktPassword = "CHANGEME"
+    ticPassword = "CHANGEME"
+    numNodes = "1"
+    cramMD5 = "Yes"
+    bbsSoftware = "CHANGEME"
 
   # left side
   gotoxy(18,12); write("|"+fieldBG+" "*20+"|"+normBG); gotoxy(7,12); write("|"+normBG+"|"+normColour+"Real Name: "+"|"+fieldBG+realName+"|"+normBG)
@@ -248,40 +250,40 @@ def addEditApplication() :
   # first arg = style; 0=n/a / 1=norm / 2=CAPS / 3=Capitalised / 4=US Phone / 5=Date MM/DD/YYYY / 6=password hidden / 7=lowercase
 
   # left side
-  gotoxy(17,12); write("|14>"); gotoxy(18,12); write("|"+fieldBG+"|"+fieldFG); realName = getstr(1, 20, 50, realName); gotoxy(17,12); write(" ");
+  #gotoxy(17,12); write("|14>"); gotoxy(18,12); write("|"+fieldBG+"|"+fieldFG); realName = getstr(1, 20, 50, realName); gotoxy(17,12); write(" ");
   gotoxy(17,13); write("|14>"); gotoxy(18,13); write("|"+fieldBG+"|"+fieldFG); bbsName = getstr(1, 20, 50, bbsName); gotoxy(17,13); write(" ");
   gotoxy(17,14); write("|14>"); gotoxy(18,14); write("|"+fieldBG+"|"+fieldFG); telnetAddress = getstr(1, 20, 50, telnetAddress); gotoxy(17,14); write(" ");
   gotoxy(17,15); write("|14>"); gotoxy(18,15); write("|"+fieldBG+"|"+fieldFG); cityState = getstr(1, 20, 50, cityState); gotoxy(17,15); write(" ");
-  gotoxy(17,16); write("|14>"); gotoxy(18,16); write("|"+fieldBG+"|"+fieldFG); sysopName = getstr(1, 20, 50, sysopName); gotoxy(17,16); write(" ");
+  #gotoxy(17,16); write("|14>"); gotoxy(18,16); write("|"+fieldBG+"|"+fieldFG); sysopName = getstr(1, 20, 50, sysopName); gotoxy(17,16); write(" ");
   gotoxy(17,17); write("|14>"); gotoxy(18,17); write("|"+fieldBG+"|"+fieldFG); emailAddress = getstr(1, 20, 50, emailAddress); gotoxy(17,17); write(" ");
   gotoxy(17,18); write("|14>"); gotoxy(18,18); write("|"+fieldBG+"|"+fieldFG); binkpAddress = getstr(1, 20, 50, binkpAddress); gotoxy(17,18); write(" ");
   gotoxy(17,19); write("|14>"); gotoxy(18,19); write("|"+fieldBG+"|"+fieldFG); binkpPort = getstr(1, 20, 50, binkpPort); gotoxy(17,19); write(" ");
 
   # right side
-  gotoxy(58,12); write("|14>"); gotoxy(59,12); write("|"+fieldBG+"|"+fieldFG); sessionPassword = getstr(1, 20, 50, sessionPassword); gotoxy(58,12); write(" ");
-  gotoxy(58,13); write("|14>"); gotoxy(59,13); write("|"+fieldBG+"|"+fieldFG); allfixPassword = getstr(1, 8, 8, allfixPassword); gotoxy(58,13); write(" ");
-  gotoxy(58,14); write("|14>"); gotoxy(59,14); write("|"+fieldBG+"|"+fieldFG); pktPassword = getstr(1, 8, 8, pktPassword); gotoxy(58,14); write(" ");
-  gotoxy(58,15); write("|14>"); gotoxy(59,15); write("|"+fieldBG+"|"+fieldFG); ticPassword = getstr(1, 8, 8, ticPassword); gotoxy(58,15); write(" ");
+  gotoxy(58,12); write("|14>"); gotoxy(59,12); write("|"+fieldBG+"|"+fieldFG); sessionPassword = getstr(2, 20, 50, sessionPassword); gotoxy(58,12); write(" ");
+  gotoxy(58,13); write("|14>"); gotoxy(59,13); write("|"+fieldBG+"|"+fieldFG); allfixPassword = getstr(2, 8, 8, allfixPassword); gotoxy(58,13); write(" ");
+  gotoxy(58,14); write("|14>"); gotoxy(59,14); write("|"+fieldBG+"|"+fieldFG); pktPassword = getstr(2, 8, 8, pktPassword); gotoxy(58,14); write(" ");
+  gotoxy(58,15); write("|14>"); gotoxy(59,15); write("|"+fieldBG+"|"+fieldFG); ticPassword = getstr(2, 8, 8, ticPassword); gotoxy(58,15); write(" ");
   gotoxy(58,16); write("|14>"); gotoxy(59,16); write("|"+fieldBG+"|"+fieldFG); numNodes = getstr(1, 20, 50, numNodes); gotoxy(58,16); write(" ");
   gotoxy(58,17); write("|14>"); gotoxy(59,17); write("|"+normBG+"|"+fieldFG); cramMD5 = getyn("", True); gotoxy(58,17); write(" ");
   gotoxy(58,18); write("|14>"); gotoxy(59,18); write("|"+fieldBG+"|"+fieldFG); bbsSoftware = getstr(1, 20, 50, bbsSoftware); gotoxy(58,18); write(" ");
 
   apDict = application[handle]
   apDict["realName"] = realName
-  apDict["bbsName"] = bbsName
-  apDict["telnetAddress"] = telnetAddress
-  apDict["cityState"] = cityState
+  apDict["bbsName"] = bbsName or "CHANGEME"
+  apDict["telnetAddress"] = telnetAddress or "CHANGEME"
+  apDict["cityState"] = cityState or "CHANGEME"
   apDict["sysopName"] = sysopName
-  apDict["emailAddress"] = emailAddress
-  apDict["binkpAddress"] = binkpAddress
-  apDict["binkpPort"] = binkpPort
-  apDict["sessionPassword"] = sessionPassword
-  apDict["allfixPassword"] = allfixPassword
-  apDict["pktPassword"] = pktPassword
-  apDict["ticPassword"] = ticPassword
-  apDict["numNodes"] = numNodes
-  apDict["cramMD5"] = cramMD5
-  apDict["bbsSoftware"] = bbsSoftware
+  apDict["emailAddress"] = emailAddress or "CHANGEME"
+  apDict["binkpAddress"] = binkpAddress or "CHANGEME"
+  apDict["binkpPort"] = binkpPort or "CHANGEME"
+  apDict["sessionPassword"] = sessionPassword or "CHANGEME"
+  apDict["allfixPassword"] = allfixPassword or "CHANGEME"
+  apDict["pktPassword"] = pktPassword or "CHANGEME"
+  apDict["ticPassword"] = ticPassword or "CHANGEME"
+  apDict["numNodes"] = numNodes or "1"
+  apDict["cramMD5"] = cramMD5 or "Yes"
+  apDict["bbsSoftware"] = bbsSoftware or "CHANGEME"
 
   gotoxy(12,23); saveApplication = getyn("Save this application? ", True)
   if saveApplication :
